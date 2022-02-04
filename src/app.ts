@@ -1,16 +1,17 @@
-import cors from 'cors';
-import path from "path";
 import helmet from 'helmet';
 import express from 'express';
 import * as bodyParser from 'body-parser';
+import BaseController from './controllers/base-ctrl';
+
+var xss = require('xss-clean');
 
 class App {
 	public app: express.Application;
 
-	constructor() {
+	constructor(controllers: BaseController[]) {
 		this.app = express();
 
-		this.initializeControllers();
+		this.initializeControllers(controllers);
 		this.initializeMiddlewares();
 	}
 
@@ -22,6 +23,7 @@ class App {
 			next();
 		});
 
+		this.app.use(xss());
 		this.app.use(helmet());
 
 		this.app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,7 +41,7 @@ class App {
 	 * @description Initializes all routes
 	 * @param controllers 
 	 */
-	public initializeControllers() {
+	public initializeControllers(controllers: BaseController[]) {
 		let that = this;
 
 		controllers.forEach((controller) => {
@@ -56,3 +58,5 @@ class App {
 		});
 	}
 }
+
+export default App;
