@@ -9,6 +9,7 @@ let rootPath = path.normalize(__dirname);
 const config: any = {
     root: rootPath,
     port: process.env.PORT || 3000,
+    DATABASE: process.env.DATABASE,
     ENV_NAME: process.env.ENV_NAME,
     TIME_ZONE: process.env.TIME_ZONE,
     SERVER_ROOT_URL: process.env.SERVER_ROOT_URL,

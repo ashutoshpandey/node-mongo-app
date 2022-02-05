@@ -63,7 +63,7 @@ class App {
 		const { SERVER_ROOT_URL = "http://localhost:${SERVER_PORT}" } = process.env;
 
 		const server = this.app.listen(SERVER_PORT, () => {
-			console.log(`Server is running at ${SERVER_ROOT_URL}...`);
+			console.log(`Server is running at ${SERVER_ROOT_URL}`);
 		});
 	}
 }

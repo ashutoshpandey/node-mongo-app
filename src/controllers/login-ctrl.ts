@@ -1,7 +1,8 @@
-import { Router } from "express";
-import BaseController from "./base-ctrl";
+import { Router } from 'express';
+import * as express from 'express';
+import BaseController from './base-ctrl';
 
-export class LoginCtrl implements BaseController {
-    router: Router;
+export class LoginController implements BaseController {
+    public router: Router = express.Router();
 
 }

@@ -1,11 +1,16 @@
 import App from './app';
 import config from './config';
-import * as mongoose from 'mongoose';
+import { connect } from 'mongoose';
+import { UserController } from './controllers/user-ctrl';
 
 const app = new App(
-    []
+    [
+        new UserController()
+    ]
 );
 
-mongoose.connect(config.DATABASE, {});
+(async () => {
+    await connect(config.DATABASE, {});
+})();
 
 app.listen();

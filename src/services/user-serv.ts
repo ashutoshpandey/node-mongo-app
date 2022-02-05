@@ -23,7 +23,7 @@ export class UserService {
         return User.find({ username: params.username });
     }
 
-    async store(params: any, headers: any = null) {
+    async create(params: any, headers: any = null) {
         let user = new User(params);
         return await user.save();
     }
