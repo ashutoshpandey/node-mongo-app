@@ -1,20 +1,15 @@
 import User from '../models/user';
-import { UserDB } from '../db/user-db';
 
 import { JwtUtil } from '../utils/jwt-util';
 import { DateUtil } from '../utils/date-util';
 import { EncryptionUtil } from '../utils/encryption-util';
 
 export class UserService {
-    private userDB: UserDB;
-
     private jwtUtil: JwtUtil;
     private dateUtil: DateUtil;
     private encryptionUtil: EncryptionUtil;
 
     constructor() {
-        this.userDB = new UserDB();
-
         this.jwtUtil = new JwtUtil();
         this.dateUtil = new DateUtil();
         this.encryptionUtil = new EncryptionUtil();

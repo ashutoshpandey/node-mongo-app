@@ -9,7 +9,7 @@ export class JwtUtil {
         this.encryptionUtil = new EncryptionUtil();
     }
 
-    public generateToken(payload) {
+    public generateToken(payload: any) {
         let token = jwt.sign(
             payload,
             config.jwt.SECRET,
