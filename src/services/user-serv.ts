@@ -1,5 +1,6 @@
 import User from '../models/user';
 
+import constants from '../utils/constants';
 import { JwtUtil } from '../utils/jwt-util';
 import { DateUtil } from '../utils/date-util';
 import { EncryptionUtil } from '../utils/encryption-util';
@@ -32,8 +33,23 @@ export class UserService {
 
     }
 
-    async filter(params: any, headers: any = null) {
+    async getUsers(params: any, headers: any) {
+        let pageNumber: number = 0;
+        let pageSize: number = constants.DEFAULT_PAGE_SIZE;
 
+        if (params.pageNumber) {
+            pageNumber = params.pageNumber;
+        }
+
+        if (params.pageSize) {
+            pageSize = params.pageSize;
+        }
+
+        return User.find({}).skip(pageSize * (pageNumber - 1)).limit(pageSize);
+    }
+
+    async filter(params: any, headers: any = null) {
+        return User.find({});
     }
 
     async remove(id: number, headers: any = null) {

@@ -19,15 +19,15 @@ class App {
 	constructor(controllers: BaseController[]) {
 		this.app = express();
 
-		this.initializeControllers(controllers);
 		this.initializeMiddlewares();
+		this.initializeControllers(controllers);
 	}
 
 	private initializeMiddlewares() {
 		this.app.use((request: express.Request, response: express.Response, next: any) => {
 			response.setHeader('Access-Control-Allow-Origin', '*');
 			response.setHeader('Access-Control-Allow-Methods', '*');
-			response.setHeader('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,authToken');
+			response.setHeader('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type');
 			next();
 		});
 

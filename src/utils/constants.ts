@@ -3,7 +3,9 @@ const constants = {
 
     API: {
         USERS: '/users'
-    }
+    },
+
+    DEFAULT_PAGE_SIZE: 10
 };
 
 export default constants;
