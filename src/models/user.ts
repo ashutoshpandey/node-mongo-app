@@ -21,6 +21,7 @@ const userSchema = new Schema({
     gender: String,
     date_of_birth: Date,
     password: String,
+    profile_image: String,
     is_deleted: {
         type: Boolean,
         default: false
