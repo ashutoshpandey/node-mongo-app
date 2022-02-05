@@ -45,7 +45,7 @@ export class UserService {
             pageSize = params.pageSize;
         }
 
-        return User.find({}).skip(pageSize * (pageNumber - 1)).limit(pageSize);
+        return User.find({}, { password: 0, is_deleted: 0 }).skip(pageSize * (pageNumber - 1)).limit(pageSize);
     }
 
     async filter(params: any, headers: any = null) {
