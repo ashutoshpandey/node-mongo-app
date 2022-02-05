@@ -1,12 +1,20 @@
 import helmet from 'helmet';
 import express from 'express';
 import * as bodyParser from 'body-parser';
+import rateLimit from 'express-rate-limit';
 import BaseController from './controllers/base-ctrl';
 
 var xss = require('xss-clean');
 
 class App {
 	public app: express.Application;
+
+	limiter = rateLimit({
+		windowMs: 15 * 60 * 1000, // 15 minutes
+		max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+		standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+		legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	});
 
 	constructor(controllers: BaseController[]) {
 		this.app = express();
@@ -25,6 +33,7 @@ class App {
 
 		this.app.use(xss());
 		this.app.use(helmet());
+		this.app.use('/api', this.limiter);		// Apply rate limiter to api routes only
 
 		this.app.use(bodyParser.urlencoded({ extended: true }));
 		this.app.use(bodyParser.json({ limit: '50mb' }));
@@ -45,7 +54,7 @@ class App {
 		let that = this;
 
 		controllers.forEach((controller) => {
-			that.app.use('/', controller.router);
+			that.app.use('/', this.limiter, controller.router);
 		});
 	}
 
