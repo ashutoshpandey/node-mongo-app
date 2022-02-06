@@ -1,5 +1,6 @@
 import User from '../models/user';
 
+import { AppError } from '../app-error';
 import constants from '../utils/constants';
 import { JwtUtil } from '../utils/jwt-util';
 import { DateUtil } from '../utils/date-util';
@@ -29,8 +30,15 @@ export class UserService {
         return await user.save();
     }
 
-    async update(id: number, params: any, headers: any = null) {
+    async update(id: any, params: any, headers: any = null) {
+        params.update_date = Date.now();
 
+        let user: any = User.findByIdAndUpdate(id, params, { new: true });
+
+        delete user.password;
+        delete user.is_deleted;
+
+        return user;
     }
 
     async getUsers(params: any, headers: any) {
@@ -52,7 +60,27 @@ export class UserService {
         return User.find({});
     }
 
-    async remove(id: number, headers: any = null) {
+    async remove(id: any, headers: any = null) {
 
+    }
+
+    async updateProfileImage(id: any, req: any, headers: any) {
+        req.body.update_date = Date.now();
+
+        let params = {
+            update_date: req.body.update_date,
+            profile_image: req.body.image_name
+        };
+
+        let user: any = User.findByIdAndUpdate(id, params, { new: true });
+
+        if (user) {
+            delete user.password;
+            delete user.is_deleted;
+
+            return user;
+        } else {
+            return Promise.reject(new AppError('Invalid user id', 404));
+        }
     }
 }

@@ -24,7 +24,6 @@ export class UserController implements BaseController {
     initializeRoutes() {
         this.router.get(
             constants.API_VERSION_V1 + constants.API.USERS + '/:pageNumber/:pageSize',
-            uploader.single('profile_image'),
             (req: express.Request, res: express.Response) => {
                 this.getUsers(req, res)
             });
@@ -34,6 +33,19 @@ export class UserController implements BaseController {
             (req: express.Request, res: express.Response) => {
                 this.createUser(req, res)
             });
+
+        this.router.put(
+            constants.API_VERSION_V1 + constants.API.USERS + '/update-profile-image/:id',
+            uploader.single('profile_image'),
+            (req: express.Request, res: express.Response) => {
+                this.updateProfileImage(req, res)
+            });
+
+        this.router.put(
+            constants.API_VERSION_V1 + constants.API.USERS + '/:id',
+            (req: express.Request, res: express.Response) => {
+                this.updateUser(req, res)
+            });
     }
 
     async createUser(req: express.Request, res: express.Response) {
@@ -42,7 +54,17 @@ export class UserController implements BaseController {
             this.responseUtil.sendResponse(res, true, result, 'Record created', 201);
         }
         catch (err) {
-            this.responseUtil.sendResponse(null, false, err, 'Some error occured', 500);
+            this.responseUtil.sendResponse(res, false, err, 'Some error occured', 500);
+        }
+    }
+
+    async updateUser(req: express.Request, res: express.Response) {
+        try {
+            let result = await this.userService.update(req.params.id, req.body, req.headers);
+            this.responseUtil.sendResponse(res, true, result, 'Record updated', 201);
+        }
+        catch (err) {
+            this.responseUtil.sendResponse(res, false, err, 'Some error occured', 500);
         }
     }
 
@@ -52,7 +74,17 @@ export class UserController implements BaseController {
             this.responseUtil.sendResponse(res, true, result, 'Data found', 200);
         }
         catch (err) {
-            this.responseUtil.sendResponse(null, false, err, 'Some error occured', 500);
+            this.responseUtil.sendResponse(res, false, err, 'Some error occured', 500);
+        }
+    }
+
+    async updateProfileImage(req: express.Request, res: express.Response) {
+        try {
+            let result = await this.userService.updateProfileImage(req.params.id, req, req.headers);
+            this.responseUtil.sendResponse(res, true, result, 'Profile updated', 201);
+        }
+        catch (err) {
+            this.responseUtil.sendResponse(res, false, err, 'Some error occured', 500);
         }
     }
 }

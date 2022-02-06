@@ -2,6 +2,7 @@ import helmet from 'helmet';
 import express from 'express';
 import * as bodyParser from 'body-parser';
 import rateLimit from 'express-rate-limit';
+import errorHandler from './utils/error-util';
 import BaseController from './controllers/base-ctrl';
 
 var xss = require('xss-clean');
@@ -43,6 +44,8 @@ class App {
 			request.body.startTime = new Date();
 			next();
 		});
+
+		this.app.use(errorHandler);
 	}
 
 	/**
