@@ -1,65 +1,57 @@
 import jwt from 'jsonwebtoken';
 import config from '../config';
+import { AppError } from '../app-error';
 import { EncryptionUtil } from './encryption-util';
 
 export class JwtUtil {
-    private encryptionUtil: EncryptionUtil;
-
-    constructor() {
-        this.encryptionUtil = new EncryptionUtil();
-    }
-
     public generateToken(payload: any) {
         let token = jwt.sign(
             payload,
-            config.jwt.SECRET,
-            { expiresIn: config.jwt.EXPIRY_SECONDS }
+            config.JWT.SECRET,
+            { expiresIn: config.JWT.EXPIRY_SECONDS }
         );
 
-        return this.encryptionUtil.encryptWithCrypto(token);
+        let encryptionUtil = new EncryptionUtil();
+        return encryptionUtil.encryptWithCrypto(token);
     }
 
-    public verifyToken(authToken: any) {
+    public verifyToken(req: any, res: any, next: any) {
         let result = {};
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            let authToken = req.headers.authorization;
+
             if (authToken) {
                 let token = authToken.split(' ')[1];
                 let secretKey = config.SERVER_KEYS.SERVER_SECRET;
 
                 if (secretKey) {
-                    let decryptedToken = this.encryptionUtil.decryptWithCrypto(token);
+                    let encryptionUtil = new EncryptionUtil();
 
-                    jwt.verify(decryptedToken, secretKey, function (err: any, decoded: any) {
-                        if (err) {
-                            result = {
-                                valid: false,
-                                message: 'Failed to verify token.'
-                            }
-                        } else {
-                            result = {
-                                valid: true
-                            }
+                    let decryptedToken = encryptionUtil.decryptWithCrypto(token);
+                    console.log('2.');
+                    console.log(decryptedToken);
+
+                    let err = jwt.verify(decryptedToken, secretKey);
+                    console.log('3.');
+
+                    if (err) {
+                        result = {
+                            valid: false,
+                            message: 'Failed to verify token.'
                         }
-
-                        resolve(result);
-                    });
-                } else {
-                    // if there is no secret key
-                    result = {
-                        valid: false
+                    } else {
+                        result = {
+                            valid: true
+                        }
                     }
 
-                    resolve(result);
+                    next();
+                } else {
+                    next(new AppError(`Server error`, 401));
                 }
             } else {
-                // if there is no token
-                result = {
-                    valid: false,
-                    message: 'No token provided.'
-                }
-
-                resolve(result);
+                next(new AppError(`You don't have access, please login first`, 401));
             }
         });
     }

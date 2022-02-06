@@ -6,46 +6,59 @@ import { UserService } from '../services/user-serv';
 
 import constants from '../utils/constants';
 import uploader from '../utils/upload-util';
+import { JwtUtil } from '../utils/jwt-util';
 import { ResponseUtil } from '../utils/response-util';
 
 export class UserController implements BaseController {
     private userService: UserService;
+
+    private jwtUtil: JwtUtil;
     private responseUtil: ResponseUtil;
 
     public router: Router = express.Router();
 
     constructor() {
         this.userService = new UserService();
+
+        this.jwtUtil = new JwtUtil();
         this.responseUtil = new ResponseUtil();
 
         this.initializeRoutes();
     }
 
     initializeRoutes() {
-        this.router.get(
-            constants.API_VERSION_V1 + constants.API.USERS + '/:pageNumber/:pageSize',
-            (req: express.Request, res: express.Response) => {
-                this.getUsers(req, res)
-            });
+        this.router
+            .route(constants.API_VERSION_V1 + constants.API.USERS + '/:pageNumber/:pageSize')
+            .get(
+                this.jwtUtil.verifyToken,
+                (req: express.Request, res: express.Response) => {
+                    this.getUsers(req, res)
+                });
 
-        this.router.post(
-            constants.API_VERSION_V1 + constants.API.USERS,
-            (req: express.Request, res: express.Response) => {
-                this.createUser(req, res)
-            });
+        this.router
+            .route(constants.API_VERSION_V1 + constants.API.USERS)
+            .post(
+                this.jwtUtil.verifyToken,
+                (req: express.Request, res: express.Response) => {
+                    this.createUser(req, res)
+                });
 
-        this.router.put(
-            constants.API_VERSION_V1 + constants.API.USERS + '/update-profile-image/:id',
-            uploader.single('profile_image'),
-            (req: express.Request, res: express.Response) => {
-                this.updateProfileImage(req, res)
-            });
+        this.router
+            .route(constants.API_VERSION_V1 + constants.API.USERS + '/update-profile-image/:id')
+            .put(
+                this.jwtUtil.verifyToken,
+                uploader.single('profile_image'),
+                (req: express.Request, res: express.Response) => {
+                    this.updateProfileImage(req, res)
+                });
 
-        this.router.put(
-            constants.API_VERSION_V1 + constants.API.USERS + '/:id',
-            (req: express.Request, res: express.Response) => {
-                this.updateUser(req, res)
-            });
+        this.router
+            .route(constants.API_VERSION_V1 + constants.API.USERS + '/:id')
+            .put(
+                this.jwtUtil.verifyToken,
+                (req: express.Request, res: express.Response) => {
+                    this.updateUser(req, res)
+                });
     }
 
     async createUser(req: express.Request, res: express.Response) {

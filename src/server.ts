@@ -2,10 +2,12 @@ import App from './app';
 import config from './config';
 import { connect } from 'mongoose';
 import { UserController } from './controllers/user-ctrl';
+import { LoginController } from './controllers/login-ctrl';
 
 const app = new App(
     [
-        new UserController()
+        new UserController(),
+        new LoginController()
     ]
 );
 

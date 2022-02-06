@@ -1,6 +1,5 @@
-import { IUser } from "../models/user";
-import { UserService } from "./user-serv";
-import { JwtUtil } from "../utils/jwt-util";
+import { UserService } from './user-serv';
+import { JwtUtil } from '../utils/jwt-util';
 import { EncryptionUtil } from "../utils/encryption-util";
 
 export class LoginService {
@@ -11,30 +10,42 @@ export class LoginService {
 
     constructor() {
         this.userService = new UserService();
+
+        this.jwtUtil = new JwtUtil();
+        this.encryptionUtil = new EncryptionUtil();
     }
 
-    public async login(params: any) {
-        let user: any = await this.userService.findByUsername(params.username);
+    public async login(params: any, headers: any) {
+        let users: any = await this.userService.findByEmail(params.email);
 
-        if (this.encryptionUtil.verifyWithBcrypt(params.password, user.password)) {
-            let payload = {
-                id: user.id
-            };
+        if (users && users[0]) {
+            let user = users[0];
 
-            const jwtToken = this.jwtUtil.generateToken(payload);
+            if (this.encryptionUtil.verifyWithBcrypt(params.password, user.password)) {
+                let payload = {
+                    id: user.id
+                };
 
-            // Don't return password
-            delete user.password;
+                const jwtToken = this.jwtUtil.generateToken(payload);
 
-            return {
-                user: user,
-                success: true,
-                token: jwtToken
-            };
+                // Don't return password
+                delete user.password;
+
+                return {
+                    user: user,
+                    success: true,
+                    token: jwtToken
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'Invalid login'
+                };
+            }
         } else {
             return {
                 success: false,
-                message: 'Invalid login'
+                message: 'User not found'
             };
         }
     }

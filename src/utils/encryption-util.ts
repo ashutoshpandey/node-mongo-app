@@ -2,14 +2,9 @@ import crypto from 'crypto';
 import * as bcrypt from 'bcryptjs';
 
 import config from '../config';
+import { AppError } from '../app-error';
 
 export class EncryptionUtil {
-    key: string;
-    algorithm: string = 'aes-256-ctr';
-
-    constructor() {
-        this.key = config.SERVER_KEYS.SERVER_SECRET;
-    }
 
     /***************** methods for bcrypt library ******************************/
 
@@ -29,27 +24,33 @@ export class EncryptionUtil {
     /***************** methods for crypto library ******************************/
 
     encryptWithCrypto(text: any) {
+        let algorithm: string = 'aes-256-ctr';
+        let key = config.SERVER_KEYS.SERVER_SECRET;
+
         let iv = crypto.randomBytes(16).toString("hex").slice(0, 16);
 
-        let cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
-        let encryptedText = cipher.update(text, "utf8", "hex");
-        encryptedText += cipher.final("hex");
+        let cipher = crypto.createCipheriv(algorithm, key, iv);
+        let encryptedText = cipher.update(text, 'utf8', 'hex');
+        encryptedText += cipher.final('hex');
         encryptedText = iv + encryptedText;
 
         return encryptedText;
     }
 
     decryptWithCrypto(text: any) {
+        let algorithm: string = 'aes-256-ctr';
+        let key = config.SERVER_KEYS.SERVER_SECRET;
+
         try {
             const iv = text.slice(0, 16);
             text = text.slice(16, text.length);
-            let decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
-            let decryptedText = decipher.update(text, "hex", "utf8");
-            decryptedText += decipher.final("utf8");
+            let decipher = crypto.createDecipheriv(algorithm, key, iv);
+            let decryptedText = decipher.update(text, 'hex', 'utf8');
+            decryptedText += decipher.final('utf8');
 
             return decryptedText;
         } catch (err) {
-            return null;
+            throw new AppError(err.toString(), 500);
         }
     }
 }

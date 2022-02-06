@@ -21,17 +21,23 @@ export class UserService {
         return User.find(params.id);
     }
 
-    async findByUsername(params: any, headers: any = null) {
-        return User.find({ username: params.username });
+    async findByEmail(params: any, headers: any = null) {
+        return User.find({ email: params.email });
     }
 
     async create(params: any, headers: any = null) {
+        params.password = this.encryptionUtil.encryptWithBcrypt(params.password);
+
         let user = new User(params);
         return await user.save();
     }
 
     async update(id: any, params: any, headers: any = null) {
         params.update_date = Date.now();
+
+        if (params.password) {
+            params.password = this.encryptionUtil.encryptWithBcrypt(params.password);
+        }
 
         let user: any = User.findByIdAndUpdate(id, params, { new: true });
 
