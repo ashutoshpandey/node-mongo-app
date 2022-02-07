@@ -25,7 +25,13 @@ export class UserService {
     }
 
     async findByEmail(params: any, headers: any = null) {
-        return User.find({ email: params.email });
+        let user: any = User.find({ email: params.email });
+
+        if (user) {
+            user.profile_image = this.genericUtil.getUserProfileImage(user.profile_image);
+        }
+
+        return user;
     }
 
     async create(params: any, headers: any = null) {
@@ -62,7 +68,14 @@ export class UserService {
             pageSize = params.pageSize;
         }
 
-        return User.find({}, { password: 0, is_deleted: 0 }).skip(pageSize * (pageNumber - 1)).limit(pageSize);
+        let users = await User.find({}, { password: 0, is_deleted: 0 }).skip(pageSize * (pageNumber - 1)).limit(pageSize);
+        if (users && users[0]) {
+            users.forEach((user: any) => {
+                user.profile_image = this.genericUtil.getUserProfileImage(user.profile_image);
+            });
+        }
+
+        return users;
     }
 
     async filter(params: any, headers: any = null) {

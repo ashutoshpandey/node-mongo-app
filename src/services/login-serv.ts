@@ -1,9 +1,11 @@
 import { UserService } from './user-serv';
 import { JwtUtil } from '../utils/jwt-util';
-import { EncryptionUtil } from "../utils/encryption-util";
+import { GenericUtil } from '../utils/generic-util';
+import { EncryptionUtil } from '../utils/encryption-util';
 
 export class LoginService {
     private jwtUtil: JwtUtil;
+    private genericUtil: GenericUtil;
     private encryptionUtil: EncryptionUtil;
 
     private userService: UserService;
@@ -12,6 +14,7 @@ export class LoginService {
         this.userService = new UserService();
 
         this.jwtUtil = new JwtUtil();
+        this.genericUtil = new GenericUtil();
         this.encryptionUtil = new EncryptionUtil();
     }
 
@@ -30,6 +33,8 @@ export class LoginService {
 
                 // Don't return password
                 delete user.password;
+
+                user.profile_image = this.genericUtil.getUserProfileImage(user.profile_image);
 
                 return {
                     user: user,
