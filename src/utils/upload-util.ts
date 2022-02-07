@@ -6,7 +6,7 @@ import { AppError } from '../app-error';
 const imageUploader = multer({
     storage: multer.diskStorage({
         destination: (req: any, file: any, callback: any) => {
-            callback(null, config.root + '/public/images/')
+            callback(null, config.root + '/public/images/users/')
         },
         filename: (req: any, file: any, callback: any) => {
             let ext = file.mimetype.split('/')[1];

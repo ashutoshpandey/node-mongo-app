@@ -44,7 +44,7 @@ export class UserController implements BaseController {
                 });
 
         this.router
-            .route(constants.API_VERSION_V1 + constants.API.USERS + '/update-profile-image/:id')
+            .route(constants.API_VERSION_V1 + constants.API.USERS + constants.API.USER_PROFILE_IMAGE + '/:id')
             .put(
                 this.jwtUtil.verifyToken,
                 uploader.single('profile_image'),

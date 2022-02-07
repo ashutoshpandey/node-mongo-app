@@ -4,16 +4,19 @@ import { AppError } from '../app-error';
 import constants from '../utils/constants';
 import { JwtUtil } from '../utils/jwt-util';
 import { DateUtil } from '../utils/date-util';
+import { GenericUtil } from '../utils/generic-util';
 import { EncryptionUtil } from '../utils/encryption-util';
 
 export class UserService {
     private jwtUtil: JwtUtil;
     private dateUtil: DateUtil;
+    private genericUtil: GenericUtil;
     private encryptionUtil: EncryptionUtil;
 
     constructor() {
         this.jwtUtil = new JwtUtil();
         this.dateUtil = new DateUtil();
+        this.genericUtil = new GenericUtil();
         this.encryptionUtil = new EncryptionUtil();
     }
 
@@ -78,13 +81,17 @@ export class UserService {
             profile_image: req.body.image_name
         };
 
-        let user: any = User.findByIdAndUpdate(id, params, { new: true });
+        let user: any = await User.findByIdAndUpdate(id, params, { new: true });
 
         if (user) {
             delete user.password;
             delete user.is_deleted;
 
-            return user;
+            let userProfileImage = this.genericUtil.getUserProfileImage(user.profile_image);
+
+            return {
+                profile_image: userProfileImage
+            };
         } else {
             return Promise.reject(new AppError('Invalid user id', 404));
         }
