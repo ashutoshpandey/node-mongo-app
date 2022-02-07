@@ -11,48 +11,39 @@ export class JwtUtil {
             { expiresIn: config.JWT.EXPIRY_SECONDS }
         );
 
-        let encryptionUtil = new EncryptionUtil();
-        return encryptionUtil.encryptWithCrypto(token);
+        return new EncryptionUtil().encryptWithCrypto(token);
     }
 
     public verifyToken(req: any, res: any, next: any) {
         let result = {};
 
-        return new Promise(async (resolve, reject) => {
+        try {
             let authToken = req.headers.authorization;
 
             if (authToken) {
                 let token = authToken.split(' ')[1];
-                let secretKey = config.SERVER_KEYS.SERVER_SECRET;
+                let secretKey = config.JWT.SECRET;
 
                 if (secretKey) {
                     let encryptionUtil = new EncryptionUtil();
 
                     let decryptedToken = encryptionUtil.decryptWithCrypto(token);
-                    console.log('2.');
-                    console.log(decryptedToken);
 
-                    let err = jwt.verify(decryptedToken, secretKey);
-                    console.log('3.');
+                    let result = jwt.verify(decryptedToken, secretKey);
 
-                    if (err) {
-                        result = {
-                            valid: false,
-                            message: 'Failed to verify token.'
-                        }
+                    if (!result) {
+                        next(new AppError('Failed to verify token.', 401));
                     } else {
-                        result = {
-                            valid: true
-                        }
+                        next();
                     }
-
-                    next();
                 } else {
                     next(new AppError(`Server error`, 401));
                 }
             } else {
                 next(new AppError(`You don't have access, please login first`, 401));
             }
-        });
+        } catch (err) {
+            next(new AppError('Cannot verify auth token', 401));
+        }
     }
 }

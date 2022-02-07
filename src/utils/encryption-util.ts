@@ -27,7 +27,7 @@ export class EncryptionUtil {
         let algorithm: string = 'aes-256-ctr';
         let key = config.SERVER_KEYS.SERVER_SECRET;
 
-        let iv = crypto.randomBytes(16).toString("hex").slice(0, 16);
+        let iv = crypto.randomBytes(16).toString('hex').slice(0, 16);
 
         let cipher = crypto.createCipheriv(algorithm, key, iv);
         let encryptedText = cipher.update(text, 'utf8', 'hex');
